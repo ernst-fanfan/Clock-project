@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>{{ location }}</h1>
+        <p>{{ time }}</p>
+        <form method="POST">
+            <button type="submit">{{ button }}</button>
+        </form>
+    </div>
+</body>
+<footer>
+    <p>{{ footer }}</p>
+</footer>
+</html>

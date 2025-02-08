@@ -1,0 +1,19 @@
+services:
+  timeweb:
+    build: .
+    ports:
+      - "8050:5000"
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /code
+  redis:
+    image: "redis:alpine"
+  # tests:
+  #   build: .
+  #   command: pytest
+  #   volumes:
+  #     - ./tests:/app/tests
+  #   depends_on:
+  #     - web
