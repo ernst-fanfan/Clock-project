@@ -1,26 +1,25 @@
 #!/usr/bin/env python3
 import requests
-import redis
-import json
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template
 
 app = Flask(__name__)
 app.secret_key = 'BAD_SECRET_KEY'
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    # app.logger.debug("| index()")
-    response = requests.get("https://timeapi.io/api/time/current/zone?timeZone=Europe%2FAmsterdam")
+def get_time_for_timezone(timezone):
+    response = requests.get(f"https://timeapi.io/api/time/current/zone?timeZone={timezone}")
     response.raise_for_status()
-    data = response.json()
+    return response.json()
 
-    return  render_template('index.html', **{
-                "title": "Time",
-                "location": data.get('timeZone'),
-                "time": data.get('time'),
-                "button": "Check time",
-                "footer": "Created by Ernst Fanfan",
-            })
+@app.route('/', methods=['GET'])
+def index():
+    timezones = ["America/New_York"] #["America/New_York", "Europe/London", "Asia/Tokyo"]
+    times = {tz: get_time_for_timezone(tz) for tz in timezones}
+
+    return render_template('index.html', **{
+        "title": "Time",
+        "times": times,
+        "footer": "Created by Ernst Fanfan",
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
