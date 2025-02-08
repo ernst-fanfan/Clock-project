@@ -10,13 +10,42 @@
     <h1>{{ title }}</h1>
     <div id="clocks">
         {% for tz, data in times.items() %}
-            <div class="clock">
+            <div class="clock" id="{{ tz }}">
                 <h2>{{ tz }}:</h2> 
-                <h3>{{ '%02d' % data.hour }}:{{ '%02d' % data.minute }}:{{ '%02d' % data.seconds }}</h3>
-                <p>{{ data.date }}</p>
+                <h3 id="{{ tz }}-time">{{ '%02d' % data.hour }}:{{ '%02d' % data.minute }}:{{ '%02d' % data.seconds }}</h3>
+                <p id="{{ tz }}-date">{{ data.date }}</p>
             </div>
         {% endfor %}
     </div>
     <footer>{{ footer }}</footer>
+    <script>
+        function updateTime() {
+            const timezones = ["America/New_York", "Europe/London", "Asia/Tokyo"];
+            timezones.forEach(tz => {
+                const timeElement = document.getElementById(`${tz}-time`);
+                const dateElement = document.getElementById(`${tz}-date`);
+                let [hour, minute, second] = timeElement.textContent.split(':').map(Number);
+                second++;
+                if (second === 60) {
+                    second = 0;
+                    minute++;
+                    if (minute === 60) {
+                        minute = 0;
+                        hour++;
+                        if (hour === 24) {
+                            hour = 0;
+                            // Update the date (simplified, not handling month/year changes)
+                            const date = new Date(dateElement.textContent);
+                            date.setDate(date.getDate() + 1);
+                            dateElement.textContent = date.toISOString().split('T')[0];
+                        }
+                    }
+                }
+                timeElement.textContent = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
+            });
+        }
+
+        setInterval(updateTime, 1000);
+    </script>
 </body>
 </html>
