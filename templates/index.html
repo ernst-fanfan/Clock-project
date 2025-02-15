@@ -8,6 +8,15 @@
 </head>
 <body>
     <h1>{{ title }}</h1>
+    <form method="POST">
+        <label for="timezones">Select Timezones:</label>
+        <select name="timezones" id="timezones" multiple>
+            {% for tz in all_timezones %}
+                <option value="{{ tz }}" {% if tz in selected_timezones %}selected{% endif %}>{{ tz }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Update Timezones</button>
+    </form>
     <div id="clocks">
         {% for tz, data in times.items() %}
             <div class="clock" id="{{ tz }}">
@@ -19,9 +28,8 @@
     </div>
     <footer>{{ footer }}</footer>
     <script>
-        function updateTime() {
-            const timezones = ["America/New_York", "Europe/London", "Asia/Tokyo"];
-            timezones.forEach(tz => {
+        function updateTime(selectedTimezones) {
+            selectedTimezones.forEach(tz => {
                 const timeElement = document.getElementById(`${tz}-time`);
                 const dateElement = document.getElementById(`${tz}-date`);
                 let [hour, minute, second] = timeElement.textContent.split(':').map(Number);
@@ -45,7 +53,10 @@
             });
         }
 
-        setInterval(updateTime, 1000);
+        document.addEventListener('DOMContentLoaded', () => {
+            const selectedTimezones = {{ selected_timezones | tojson }};
+            setInterval(() => updateTime(selectedTimezones), 1000);
+        });
     </script>
 </body>
 </html>
