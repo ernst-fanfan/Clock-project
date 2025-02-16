@@ -28,36 +28,34 @@
     </div>
     <footer>{{ footer }}</footer>
     <script>
-        async function fetchCurrentTimes(selectedTimezones) {
-            const response = await fetch('/timezones');
-            const allTimes = await response.json();
-            selectedTimezones.forEach(tz => {
-                const timeElement = document.getElementById(`${tz}-time`);
-                const dateElement = document.getElementById(`${tz}-date`);
-                const currentTime = allTimes[tz];
-                timeElement.textContent = `${String(currentTime.hour).padStart(2, '0')}:${String(currentTime.minute).padStart(2, '0')}:${String(currentTime.seconds).padStart(2, '0')}`;
-                dateElement.textContent = currentTime.date;
-            });
-        }
-
         function updateTime(selectedTimezones) {
-            const now = new Date();
             selectedTimezones.forEach(tz => {
                 const timeElement = document.getElementById(`${tz}-time`);
                 const dateElement = document.getElementById(`${tz}-date`);
                 let [hour, minute, second] = timeElement.textContent.split(':').map(Number);
-                second = now.getSeconds();
-                minute = now.getMinutes();
-                hour = now.getHours();
+                second++;
+                if (second === 60) {
+                    second = 0;
+                    minute++;
+                    if (minute === 60) {
+                        minute = 0;
+                        hour++;
+                        if (hour === 24) {
+                            hour = 0;
+                            // Update the date (simplified, not handling month/year changes)
+                            const date = new Date(dateElement.textContent);
+                            date.setDate(date.getDate() + 1);
+                            dateElement.textContent = date.toISOString().split('T')[0];
+                        }
+                    }
+                }
                 timeElement.textContent = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
             });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             const selectedTimezones = {{ selected_timezones | tojson }};
-            fetchCurrentTimes(selectedTimezones);
             setInterval(() => updateTime(selectedTimezones), 1000);
-            setInterval(() => fetchCurrentTimes(selectedTimezones), 60000); // Sync every minute
         });
     </script>
 </body>
